@@ -1,0 +1,14 @@
+{
+  "name": "metafy",
+  "description": "Add meta data to an object that describes and limits interaction with it",
+  "version": "0.1.0",
+  "main": "index.js",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KylePalko/metafy"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
