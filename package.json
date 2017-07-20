@@ -1,7 +1,7 @@
 {
   "name": "metafy",
   "description": "Add meta data to an object that describes and limits interaction with it",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "main": "index.js",
   "license": "MIT",
   "repository": {
