@@ -22,6 +22,10 @@ const proxy = (event = {}, path = [], originalEvent = null) => {
                 originalEvent = event
             }
 
+            /*
+             * Determine if the user is trying to call $freeze() or $lock() and return the
+             * corresponding function so it is invoked.
+             */
             switch(property) {
                 case '$freeze':
                     return freeze(_path, originalEvent.$meta)
@@ -32,7 +36,8 @@ const proxy = (event = {}, path = [], originalEvent = null) => {
             }
 
             /*
-             * Proxy primitives are created to handle calls to $lock and $freeze on primitive types.
+             * Proxy methods ($lock and $freeze) are added to primitive types and functions.
+             * e.g., a user can call .$lock() and .$freeze() on a string.
              */
             switch(typeof value) {
                 case 'object':
