@@ -1,25 +1,25 @@
-const proxy = (event = {}, path = [], originalEvent = null) => {
+const proxy = (obj = {}, path = [], originalObj = null) => {
 
-    if (typeof event !== 'object') {
-        throw `event-type-non-object`
+    if (typeof obj !== 'object') {
+        throw `obj-type-non-object`
     }
 
-    if (typeof event.$meta === 'undefined' && originalEvent === null) {
-        event.$meta = {
+    if (typeof obj.$meta === 'undefined' && originalObj === null) {
+        obj.$meta = {
             'frozen': [],
             'type-locked': []
         }
     }
 
-    return new Proxy(event, {
+    return new Proxy(obj, {
 
         get: function (target, property) {
 
             const value = target[property]
             const _path = [ ...path, property ]
 
-            if (originalEvent === null) {
-                originalEvent = event
+            if (originalObj === null) {
+                originalObj = obj
             }
 
             /*
@@ -28,9 +28,9 @@ const proxy = (event = {}, path = [], originalEvent = null) => {
              */
             switch(property) {
                 case '$freeze':
-                    return freeze(_path, originalEvent.$meta)
+                    return freeze(_path, originalObj.$meta)
                 case '$lock':
-                    return lock(_path, originalEvent.$meta)
+                    return lock(_path, originalObj.$meta)
                 case '$meta':
                     throw 'meta-is-reserved-property'
             }
@@ -41,15 +41,15 @@ const proxy = (event = {}, path = [], originalEvent = null) => {
              */
             switch(typeof value) {
                 case 'object':
-                    return proxy(value, [ ...path, property ], originalEvent)
+                    return proxy(value, [ ...path, property ], originalObj)
                 case 'string':
-                    return createProxyString(_path, originalEvent.$meta, value)
+                    return createProxyString(_path, originalObj.$meta, value)
                 case 'number':
-                    return createProxyNumber(_path, originalEvent.$meta, value)
+                    return createProxyNumber(_path, originalObj.$meta, value)
                 case 'boolean':
-                    return createProxyBoolean(_path, originalEvent.$meta, value)
+                    return createProxyBoolean(_path, originalObj.$meta, value)
                 case 'function':
-                    return addProxyMethodsToFunction(_path, originalEvent.$meta, value)
+                    return addProxyMethodsToFunction(_path, originalObj.$meta, value)
                 default:
                     return value
             }
@@ -59,13 +59,13 @@ const proxy = (event = {}, path = [], originalEvent = null) => {
 
             const _path = [ ...path, property ]
 
-            if (originalEvent === null) {
-                originalEvent = event
+            if (originalObj === null) {
+                originalObj = obj
             }
 
-            if (isFrozen(_path, originalEvent.$meta)) {
+            if (isFrozen(_path, originalObj.$meta)) {
                 throw `property-frozen`
-            } else if (isTypeLocked(_path, originalEvent.$meta) && typeof value !== typeof target[property]) {
+            } else if (isTypeLocked(_path, originalObj.$meta) && typeof value !== typeof target[property]) {
                 throw `property-type-locked`
             }
 
@@ -167,9 +167,9 @@ const createProxyNumber = (path, $meta, value) => {
 }
 
 const addProxyMethodsToFunction = (path, $meta, value) => {
-    value.$freeze = freeze(path, $meta)
-    value.$lock = lock(path, $meta)
+    value.$freeze = () => freeze(path, $meta)
+    value.$lock = () => lock(path, $meta)
     return value
 }
 
-module.exports = (event) => proxy(event)
+module.exports = (obj) => proxy(obj)
