@@ -17,7 +17,7 @@ const MyObject = metafy({
    message: 'Hello, world!'
 })
 
-MyObject.message.$lock // Prevents changing of types
+MyObject.message.$lock() // Prevents changing of types
 
 try {
     MyObject.message = 5
@@ -34,7 +34,7 @@ const MyObject = metafy({
    message: 'Hello, world!'
 })
 
-MyObject.message.$freeze // Freeze the value
+MyObject.message.$freeze() // Freeze the value
 
 try {
    MyObject.message = 'Hello!'
