@@ -43,6 +43,8 @@ const proxy = (event = {}, path = [], originalEvent = null) => {
                     return createProxyNumber(_path, originalEvent.$meta, value)
                 case 'boolean':
                     return createProxyBoolean(_path, originalEvent.$meta, value)
+                case 'function':
+                    return addProxyMethodsToFunction(_path, originalEvent.$meta, value)
                 default:
                     return value
             }
@@ -51,6 +53,10 @@ const proxy = (event = {}, path = [], originalEvent = null) => {
         set: function (target, property, value) {
 
             const _path = [ ...path, property ]
+
+            if (originalEvent === null) {
+                originalEvent = event
+            }
 
             if (isFrozen(_path, originalEvent.$meta)) {
                 throw `property-frozen`
@@ -65,7 +71,7 @@ const proxy = (event = {}, path = [], originalEvent = null) => {
 
 const freeze = (path, $meta) => {
 
-    if (path.length === 1) {
+    if (path.length === 0) {
         throw `root-cannot-be-frozen`
     }
 
@@ -77,7 +83,7 @@ const freeze = (path, $meta) => {
 
 const lock = (path, $meta) => {
 
-    if (path.length === 1) {
+    if (path.length === 0) {
         throw `root-cannot-be-type-locked`
     }
 
@@ -153,6 +159,12 @@ const createProxyNumber = (path, $meta, value) => {
     }
 
     return new ProxyNumber(value)
+}
+
+const addProxyMethodsToFunction = (path, $meta, value) => {
+    value.$freeze = freeze(path, $meta)
+    value.$lock = lock(path, $meta)
+    return value
 }
 
 module.exports = (event) => proxy(event)
